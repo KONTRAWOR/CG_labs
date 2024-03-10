@@ -23,8 +23,18 @@ namespace cg_lab2_0002
         private PointF startPoint;
         private bool isDragging = false;
         private PointF draggedPoint;
-        int  correctMode;
+        int?  correctMode;
          public int choosedCorrectPoint;
+         
+         
+         
+         public List<double> recorderPointsWithStepT = new List<double>();
+         public List<PointF> recorderPointsWithStepDots = new List<PointF>();
+         public double step;
+         public float start;
+         public float end;
+         
+         public int findPointBool;
         public Form1()
         {
             InitializeComponent();
@@ -57,8 +67,8 @@ namespace cg_lab2_0002
 
                     if (correctMode == 1)
                     {
-                        textBox1.Text = (points[i].X / 25).ToString();
-                        textBox2.Text = (points[i].Y / 25).ToString();
+                        textBox1.Text = ((points[i].X - 225) / 25).ToString();
+                        textBox2.Text = ((points[i].Y - 225) / 25).ToString();
                         choosedCorrectPoint = i;
                     }
 
@@ -177,6 +187,11 @@ namespace cg_lab2_0002
         }
         public void BazierCurveMatrix(List<PointF> controlPoints)
         {
+            
+            recorderPointsWithStepT.Clear();
+            recorderPointsWithStepDots.Clear();
+            
+            
             if (points.Count == 0)
             {
                 return;
@@ -185,7 +200,8 @@ namespace cg_lab2_0002
             Graphics g = panel1.CreateGraphics();
             int n = controlPoints.Count;
             PointF previousPoint = new PointF(225, 225);
-    
+            double previousPointForStep = 0;
+
             double[,] matrix = BezierMatrix(controlPoints);
 
             for (double t = 0; t <= 1; t += 0.001)
@@ -207,6 +223,8 @@ namespace cg_lab2_0002
     
                     p.X += (float)(controlPoints[i].X * factor);
                     p.Y += (float)(controlPoints[i].Y * factor);
+
+                   
                 }
         
                 // Use the calculated point p to draw the Bezier curve
@@ -226,11 +244,34 @@ namespace cg_lab2_0002
                 }
 
                 previousPoint = p;
+                
+                if (findPointBool == 1 && Math.Abs(t - end) > 0.0005)
+                {
+                    if (t == start)
+                    {
+                        recorderPointsWithStepT.Add(t);
+                        
+                        PointF final = new PointF((p.X - 225) / 25 , ((p.Y - 225) / 25) * -1);
+                        
+                        recorderPointsWithStepDots.Add(final);
+                    }
+                    else if (Math.Abs(t - (recorderPointsWithStepT[recorderPointsWithStepT.Count - 1] + step)) < 0.0005)
+                    {
+                        recorderPointsWithStepT.Add(t);
+                        
+                        DrawCircle(g, p);
+                        PointF final = new PointF((p.X - 225) / 25 , ((p.Y - 225) / 25)  * -1);
+                        
+                        recorderPointsWithStepDots.Add(final);
+                    }
+                }
             }
            
             string filePath = "D:\\term4\\CG\\cg_lab2_0002\\cg_lab2_0002\\matrix.txt";
 
             SaveMatrixToFile(matrix, filePath);
+            findPointBool = 0;
+            
         }
 
         public static void SaveMatrixToFile(double[,] matrix, string filePath)
@@ -266,11 +307,11 @@ namespace cg_lab2_0002
         private void DrawCircle(Graphics g, PointF point)
         {
             // Calculate the rectangle to draw the circle
-            float circleRadius = 2;
+            float circleRadius = 3;
             RectangleF circleRect = new RectangleF(point.X - circleRadius, point.Y - circleRadius, 2 * circleRadius, 2 * circleRadius);
 
             // Draw the circle
-            g.FillEllipse(Brushes.Red, circleRect);
+            g.FillEllipse(Brushes.Blue, circleRect);
         }
         
         private void DrawLines(Graphics g, PointF points, PointF pointSecond)
@@ -390,6 +431,7 @@ namespace cg_lab2_0002
         private void Form1_Load(object sender, EventArgs e)
         {
             label3.Hide();
+            label6.Hide();
         }
 
         private void panen(object sender, MouseEventArgs e)
@@ -403,14 +445,34 @@ namespace cg_lab2_0002
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-             correctMode = 0;
-            
+            if (correctMode == 0)
+            {
+                correctMode = 2;
+                label6.Hide();
+            }
+            else
+            {
+                correctMode = 0;
+                label6.Show();
+                label3.Hide();
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            correctMode = 1;
-            label3.Show();
+            
+            
+            if (correctMode == 1)
+            {
+                correctMode = 2;
+                label3.Hide();
+            }
+            else
+            {
+                correctMode = 1;
+                label3.Show();
+                label6.Hide();
+            }
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -420,10 +482,96 @@ namespace cg_lab2_0002
             float yPoint = Convert.ToSingle(textBox2.Text);
 
             point.X = xPoint * gridSize + 225;
-            point.Y = yPoint * gridSize + 225;
+            point.Y = 225 - yPoint * gridSize ;
             points[choosedCorrectPoint] = point;
             
             panel1.Invalidate(); //version 1
+        }
+
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            findPointBool = 1;
+            if (string.IsNullOrWhiteSpace(textBox5.Text) || string.IsNullOrWhiteSpace(textBox4.Text) || string.IsNullOrWhiteSpace(textBox3.Text))
+            {
+                MessageBox.Show("Please enter values in all text boxes.", "Missing Values", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return; 
+            }
+            panel1.Invalidate();
+            
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(textBox3.Text, out float result))
+            {
+                start = result;
+            }
+            else
+            {
+                // Handle invalid input, such as displaying an error message
+                MessageBox.Show("Invalid input. Please enter a valid number.");
+                // You may also choose to reset the value to a default or previous value
+                // start = DefaultValue; // Adjust DefaultValue as needed
+            }
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(textBox4.Text, out float result))
+            {
+                end = result;
+            }
+            else
+            {
+                MessageBox.Show("Invalid input. Please enter a valid number.");
+                // Optionally handle the error by resetting to a default or previous value
+                // end = DefaultValue; // Adjust DefaultValue as needed
+            }
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(textBox5.Text, out float result))
+            {
+                step = result;
+            }
+            else
+            {
+                MessageBox.Show("Invalid input. Please enter a valid number.");
+                // Optionally handle the error by resetting to a default or previous value
+                // step = DefaultValue; // Adjust DefaultValue as needed
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            // Create a StringBuilder to construct the message
+            
+           
+            
+            
+            StringBuilder messageBuilder = new StringBuilder();
+
+            // Iterate through the list of points
+            foreach (PointF point in recorderPointsWithStepDots)
+            {
+                // Append the coordinates of each point to the message
+                messageBuilder.AppendLine($"X: {point.X}, Y: {point.Y}");
+            }
+
+            // Display the message box with the points
+            MessageBox.Show(messageBuilder.ToString(), "Points Information");
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }
