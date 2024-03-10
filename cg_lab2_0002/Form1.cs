@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,13 +21,63 @@ namespace cg_lab2_0002
         public int panelWidth = 250;
         public int panelHeight = 250;
         private PointF startPoint;
+        private bool isDragging = false;
+        private PointF draggedPoint;
+        int  correctMode;
+         public int choosedCorrectPoint;
         public Form1()
         {
             InitializeComponent();
             InitializeGrid();
             InitializeGraphics();
             InitializePoints();
+            panel1.MouseClick += Panel1_MouseClick;
+            
         }
+        
+       
+        private void Panel1_MouseClick(object sender, MouseEventArgs e)
+        {
+            Point clickLocation = e.Location;
+            
+            // Check if the mouse click is near any existing point
+            for (int i = 0; i < points.Count; i++)
+            {
+                PointF point = points[i];
+                float distance = (float)Math.Sqrt(Math.Pow(e.X - point.X, 2) + Math.Pow(e.Y - point.Y, 2));
+                if (distance <= 5) // Adjust the radius as needed
+                {
+                    if (correctMode == 0)
+                    {
+                        // Remove the point from the list
+                        points.RemoveAt(i); //version 1
+                        // Redraw the panel
+                        panel1.Invalidate(); //version 1
+                    }
+
+                    if (correctMode == 1)
+                    {
+                        textBox1.Text = (points[i].X / 25).ToString();
+                        textBox2.Text = (points[i].Y / 25).ToString();
+                        choosedCorrectPoint = i;
+                    }
+
+                    
+
+                    // Exit the method since we found and removed the point
+                    return;
+                }
+            }
+            
+            // Add the click location to the list of control points
+            points.Add(clickLocation);
+
+            // Redraw the panel
+            panel1.Invalidate();
+            
+        }
+        
+        
         private void InitializeGrid()
         {
             // Встановлюємо розміри панелі
@@ -43,18 +94,7 @@ namespace cg_lab2_0002
         
         private void InitializePoints()
         {
-            PointF p0 = new PointF(-5, -5);
-            PointF p1 = new PointF(5, -5);
-            PointF p2 = new PointF(2, 3);
-            PointF p3 = new PointF(4, 3);
-            PointF p4 = new PointF(5, 3);
-            
-
-            points.Add(p0);
-            points.Add(p1);
-            points.Add(p2);
-            points.Add(p3);
-            points.Add(p4);
+          
             
             for (int i = 0; i < points.Count; i++)
             {
@@ -137,9 +177,15 @@ namespace cg_lab2_0002
         }
         public void BazierCurveMatrix(List<PointF> controlPoints)
         {
+            if (points.Count == 0)
+            {
+                return;
+            }
+            
             Graphics g = panel1.CreateGraphics();
             int n = controlPoints.Count;
-
+            PointF previousPoint = new PointF(225, 225);
+    
             double[,] matrix = BezierMatrix(controlPoints);
 
             for (double t = 0; t <= 1; t += 0.001)
@@ -150,7 +196,7 @@ namespace cg_lab2_0002
                     T.Add(Math.Pow(t, k));
                 }
 
-                PointF p = new Point(0, 0);
+                PointF p = new PointF(0, 0);
                 for (int i = 0; i < T.Count; i++)
                 {
                     double factor = 0;
@@ -158,16 +204,65 @@ namespace cg_lab2_0002
                     {
                         factor += T[j] * matrix[i, j];
                     }
-            
+    
                     p.X += (float)(controlPoints[i].X * factor);
                     p.Y += (float)(controlPoints[i].Y * factor);
                 }
-
+        
                 // Use the calculated point p to draw the Bezier curve
-                g.FillRectangle(Brushes.Orange, p.X, p.Y, 1, 1); // Example drawing, adjust as needed
+                if (t == 0)
+                {
+                    using (Pen pen = new Pen(Color.Red))
+                    {
+                        g.DrawLine(pen, controlPoints[0], p);
+                    }
+                }
+                else
+                {
+                    using (Pen pen = new Pen(Color.Red))
+                    {
+                        g.DrawLine(pen, p, previousPoint);
+                    }
+                }
+
+                previousPoint = p;
+            }
+           
+            string filePath = "D:\\term4\\CG\\cg_lab2_0002\\cg_lab2_0002\\matrix.txt";
+
+            SaveMatrixToFile(matrix, filePath);
+        }
+
+        public static void SaveMatrixToFile(double[,] matrix, string filePath)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                int rows = matrix.GetLength(0);
+                int cols = matrix.GetLength(1);
+
+                int valueWidth = 8; // Adjust as needed
+
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        string formattedValue = matrix[i, j].ToString("F2").PadLeft(valueWidth);
+
+                        writer.Write(formattedValue);
+
+                        if (j < cols - 1)
+                        {
+                            writer.Write("\t");
+                        }
+                    }
+
+                    writer.WriteLine();
+                }
             }
         }
 
+
+      
         private void DrawCircle(Graphics g, PointF point)
         {
             // Calculate the rectangle to draw the circle
@@ -180,9 +275,9 @@ namespace cg_lab2_0002
         
         private void DrawLines(Graphics g, PointF points, PointF pointSecond)
         {
-            if (points == null || pointSecond == null){
-                return;
-            }
+            if (points == null || pointSecond == null){ return; }
+            
+                
                 g.DrawLine(Pens.Black, points, pointSecond);
         }
         
@@ -213,13 +308,16 @@ namespace cg_lab2_0002
             
             g.DrawLine(dashedPen, startPoint, endPoint);
         }
-
+       
       
 
+        
+       
+        
         private void Panel1_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-
+            Graphics c = panel1.CreateGraphics();
             for (int x = 0; x <= panelWidth; x += gridSize)
             {
                 if (panelWidth / 2 == x)
@@ -249,6 +347,16 @@ namespace cg_lab2_0002
                     g.DrawString(label, DefaultFont, Brushes.Black, new PointF(panelWidth / 2, y));
                 }
             }
+            
+            drawLines(points);
+            BazierCurveMatrix(points);
+            
+            // Draw points as filled ellipses
+            foreach (PointF point in points)
+            {
+                e.Graphics.FillEllipse(Brushes.Black, point.X - 5, point.Y - 5, 10, 10);
+            }
+            
         }
 
        
@@ -270,6 +378,52 @@ namespace cg_lab2_0002
 
         private void buttobtnBezierCurven1_Click_1(object sender, EventArgs e)
         {
+            panel1.Invalidate();
+            points.Clear();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            label3.Hide();
+        }
+
+        private void panen(object sender, MouseEventArgs e)
+        {
+        }
+
+        private void panel1_Paint_1(object sender, PaintEventArgs e)
+        {
+            
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+             correctMode = 0;
+            
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            correctMode = 1;
+            label3.Show();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            PointF point = points[choosedCorrectPoint];
+            float xPoint = Convert.ToSingle(textBox1.Text);
+            float yPoint = Convert.ToSingle(textBox2.Text);
+
+            point.X = xPoint * gridSize + 225;
+            point.Y = yPoint * gridSize + 225;
+            points[choosedCorrectPoint] = point;
+            
+            panel1.Invalidate(); //version 1
         }
     }
 }

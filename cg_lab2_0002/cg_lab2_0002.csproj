@@ -53,10 +53,19 @@
         <Compile Include="Form1.Designer.cs">
             <DependentUpon>Form1.cs</DependentUpon>
         </Compile>
+        <Compile Include="ModalForm.cs">
+          <SubType>Form</SubType>
+        </Compile>
+        <Compile Include="ModalForm.Designer.cs">
+          <DependentUpon>ModalForm.cs</DependentUpon>
+        </Compile>
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <EmbeddedResource Include="Form1.resx">
           <DependentUpon>Form1.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Include="ModalForm.resx">
+          <DependentUpon>ModalForm.cs</DependentUpon>
         </EmbeddedResource>
         <EmbeddedResource Include="Properties\Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
@@ -79,6 +88,10 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config"/>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="goal.txt" />
+      <Content Include="matrix.txt" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
 </Project>

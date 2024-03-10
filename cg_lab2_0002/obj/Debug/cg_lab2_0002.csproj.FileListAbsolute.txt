@@ -8,3 +8,4 @@ D:\term4\CG\cg_lab2_0002\cg_lab2_0002\bin\Debug\cg_lab2_0002.pdb
 D:\term4\CG\cg_lab2_0002\cg_lab2_0002\obj\Debug\cg_lab2_0002.exe
 D:\term4\CG\cg_lab2_0002\cg_lab2_0002\obj\Debug\cg_lab2_0002.pdb
 D:\term4\CG\cg_lab2_0002\cg_lab2_0002\obj\Debug\cg_lab2_0002.Form1.resources
+D:\term4\CG\cg_lab2_0002\cg_lab2_0002\obj\Debug\cg_lab2_0002.ModalForm.resources
