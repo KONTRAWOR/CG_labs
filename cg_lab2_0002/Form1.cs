@@ -26,7 +26,21 @@ namespace cg_lab2_0002
             InitializeGrid();
             InitializeGraphics();
             InitializePoints();
+            panel1.MouseClick += Panel1_MouseClick;
+            panel1.Paint += Panel1_Paint;
         }
+        
+        private void Panel1_MouseClick(object sender, MouseEventArgs e)
+        {
+            Point clickLocation = e.Location;
+
+            // Add the click location to the list of control points
+            points.Add(clickLocation);
+
+            // Redraw the panel
+            panel1.Invalidate();
+        }
+        
         private void InitializeGrid()
         {
             // Встановлюємо розміри панелі
@@ -43,18 +57,7 @@ namespace cg_lab2_0002
         
         private void InitializePoints()
         {
-            PointF p0 = new PointF(-5, -5);
-            PointF p1 = new PointF(5, -5);
-            PointF p2 = new PointF(2, 3);
-            PointF p3 = new PointF(4, 3);
-            PointF p4 = new PointF(5, 3);
-            
-
-            points.Add(p0);
-            points.Add(p1);
-            points.Add(p2);
-            points.Add(p3);
-            points.Add(p4);
+          
             
             for (int i = 0; i < points.Count; i++)
             {
@@ -137,9 +140,15 @@ namespace cg_lab2_0002
         }
         public void BazierCurveMatrix(List<PointF> controlPoints)
         {
+            if (points.Count == 0)
+            {
+                return;
+            }
+            
             Graphics g = panel1.CreateGraphics();
             int n = controlPoints.Count;
-
+            PointF previousPoint = new PointF(225, 225);
+    
             double[,] matrix = BezierMatrix(controlPoints);
 
             for (double t = 0; t <= 1; t += 0.001)
@@ -150,7 +159,7 @@ namespace cg_lab2_0002
                     T.Add(Math.Pow(t, k));
                 }
 
-                PointF p = new Point(0, 0);
+                PointF p = new PointF(0, 0);
                 for (int i = 0; i < T.Count; i++)
                 {
                     double factor = 0;
@@ -158,16 +167,33 @@ namespace cg_lab2_0002
                     {
                         factor += T[j] * matrix[i, j];
                     }
-            
+    
                     p.X += (float)(controlPoints[i].X * factor);
                     p.Y += (float)(controlPoints[i].Y * factor);
                 }
-
+        
                 // Use the calculated point p to draw the Bezier curve
-                g.FillRectangle(Brushes.Orange, p.X, p.Y, 1, 1); // Example drawing, adjust as needed
+                if (t == 0)
+                {
+                    using (Pen pen = new Pen(Color.Red))
+                    {
+                        g.DrawLine(pen, controlPoints[0], p);
+                    }
+                }
+                else
+                {
+                    using (Pen pen = new Pen(Color.Red))
+                    {
+                        g.DrawLine(pen, p, previousPoint);
+                    }
+                }
+
+                previousPoint = p;
             }
         }
 
+
+      
         private void DrawCircle(Graphics g, PointF point)
         {
             // Calculate the rectangle to draw the circle
@@ -180,9 +206,9 @@ namespace cg_lab2_0002
         
         private void DrawLines(Graphics g, PointF points, PointF pointSecond)
         {
-            if (points == null || pointSecond == null){
-                return;
-            }
+            if (points == null || pointSecond == null){ return; }
+            
+                
                 g.DrawLine(Pens.Black, points, pointSecond);
         }
         
@@ -219,7 +245,7 @@ namespace cg_lab2_0002
         private void Panel1_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-
+            Graphics c = panel1.CreateGraphics();
             for (int x = 0; x <= panelWidth; x += gridSize)
             {
                 if (panelWidth / 2 == x)
@@ -249,6 +275,9 @@ namespace cg_lab2_0002
                     g.DrawString(label, DefaultFont, Brushes.Black, new PointF(panelWidth / 2, y));
                 }
             }
+            
+            drawLines(points);
+            BazierCurveMatrix(points);
         }
 
        
@@ -270,6 +299,8 @@ namespace cg_lab2_0002
 
         private void buttobtnBezierCurven1_Click_1(object sender, EventArgs e)
         {
+            panel1.Invalidate();
+            points.Clear();
         }
     }
 }
