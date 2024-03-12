@@ -49,6 +49,10 @@
             this.Step = new System.Windows.Forms.Label();
             this.button5 = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
+            this.MatrixLabel = new System.Windows.Forms.Label();
+            this.RarametricLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // panel1
@@ -132,9 +136,9 @@
             // label3
             // 
             this.label3.BackColor = System.Drawing.SystemColors.Highlight;
-            this.label3.Location = new System.Drawing.Point(545, 19);
+            this.label3.Location = new System.Drawing.Point(544, 22);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(122, 23);
+            this.label3.Size = new System.Drawing.Size(123, 23);
             this.label3.TabIndex = 9;
             this.label3.Text = "Edit button mod\r\n";
             // 
@@ -218,11 +222,50 @@
             // label6
             // 
             this.label6.BackColor = System.Drawing.Color.IndianRed;
-            this.label6.Location = new System.Drawing.Point(546, 19);
+            this.label6.Location = new System.Drawing.Point(544, 22);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(121, 23);
+            this.label6.Size = new System.Drawing.Size(123, 23);
             this.label6.TabIndex = 19;
             this.label6.Text = "Delete Mode";
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(692, 467);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(144, 52);
+            this.button6.TabIndex = 20;
+            this.button6.Text = "Parametryc";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(691, 539);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(144, 49);
+            this.button7.TabIndex = 21;
+            this.button7.Text = "Matrix";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
+            // MatrixLabel
+            // 
+            this.MatrixLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            this.MatrixLabel.Location = new System.Drawing.Point(544, 45);
+            this.MatrixLabel.Name = "MatrixLabel";
+            this.MatrixLabel.Size = new System.Drawing.Size(123, 23);
+            this.MatrixLabel.TabIndex = 22;
+            this.MatrixLabel.Text = "Matrix Mode";
+            // 
+            // RarametricLabel
+            // 
+            this.RarametricLabel.BackColor = System.Drawing.Color.BlueViolet;
+            this.RarametricLabel.Location = new System.Drawing.Point(544, 45);
+            this.RarametricLabel.Name = "RarametricLabel";
+            this.RarametricLabel.Size = new System.Drawing.Size(123, 23);
+            this.RarametricLabel.TabIndex = 23;
+            this.RarametricLabel.Text = "Parametryc mode";
+            this.RarametricLabel.Click += new System.EventHandler(this.RarametricLabel_Click);
             // 
             // Form1
             // 
@@ -230,6 +273,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(868, 727);
+            this.Controls.Add(this.RarametricLabel);
+            this.Controls.Add(this.MatrixLabel);
+            this.Controls.Add(this.button7);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.Step);
@@ -256,6 +303,13 @@
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.Label MatrixLabel;
+        private System.Windows.Forms.Label RarametricLabel;
+
+        private System.Windows.Forms.Button button7;
+
+        private System.Windows.Forms.Button button6;
 
         private System.Windows.Forms.Label label6;
 
