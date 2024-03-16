@@ -13,6 +13,7 @@
     {
         public partial class Form1 : Form
         {
+            
             private Graphics graphics;
             private List<PointF> points = new List<PointF>();
             private int centerX;
@@ -46,7 +47,7 @@
             }
             
             
-           
+            
             private void Panel1_MouseClick(object sender, MouseEventArgs e)
             {
                 if (moreofDrawing == 2)
@@ -80,15 +81,12 @@
 
                         
 
-                        // Exit the method since we found and removed the point
                         return;
                     }
                 }
 
-
                 if (moreofDrawing == 0 || moreofDrawing == 1)
                 {
-                    // Add the click location to the list of control points
                     points.Add(clickLocation);
                 }
                 
@@ -101,15 +99,10 @@
                 {
                     BazierCurveParamiter(points);
                 }
-                
-
-
                 // Redraw the panel
                 panel1.Invalidate();
                 
             }
-            
-            
             private void InitializeGrid()
             {
                 // Встановлюємо розміри панелі
@@ -123,7 +116,6 @@
                 startPoint = new PointF(panelWidth / 2, panelHeight / 2);
 
             }
-            
             private void InitializePoints()
             {
               
@@ -133,35 +125,26 @@
                     points[i] = ToggleCoord(points[i]);
                 }
             }
-
             private void InitializeGraphics()
             {
                 graphics = panel1.CreateGraphics();
                 centerX = panel1.Width / 2;
                 centerY = panel1.Height / 2;
             }
-
             private PointF ToggleCoord(PointF point)
             {
-                // Create a new PointF with modified coordinates and return it
                 return new PointF(centerX + point.X * gridSize, centerY - point.Y * gridSize);
             }
-
-
             public static double Factorial(int n)
             {
                 if (n < 0) return -1;
                 if (n == 0) return 1;
                 else return n * Factorial(n - 1);
             }
-
             public static double NCi(int n, int i)
             {
                 return Factorial(n) / (Factorial(i) * Factorial(n - i));
             }
-            
-            
-            
             static public double[,] BezierMatrix(List<PointF> controlPoint)
             {
                 int n = controlPoint.Count;
@@ -189,7 +172,6 @@
                 
                 return newMatrix;
             }
-            
             static public double[,] ReverseMatrixRows(double[,] matrix)
             {
                 int rows = matrix.GetLength(0);
@@ -295,24 +277,22 @@
                 findPointBool = 0;
                 
             }
-
             public void BazierCurveParamiter(List<PointF> controlPoints)
             {
                 
                 recorderPointsWithStepT.Clear();
                 recorderPointsWithStepDots.Clear();
 
-                if (controlPoints.Count == 0)
-                {
+                if (controlPoints.Count == 0) {
                     return;
                 }
+                
                 int n = controlPoints.Count;
                 PointF previousPoint = controlPoints[0];
                 
                 Graphics g = panel1.CreateGraphics();
                 double previousPointForStep = 0;
-
-      
+                
                 for (double t = step; t <= 1; t += 0.001)
                 {
                     
@@ -348,7 +328,6 @@
                     previousPoint = p;
                     
 
-                    // Record points
                     if (findPointBool == 1 && Math.Abs(t - end) > 0.0005)
                     {
                         if (t == start || Math.Abs(t - (recorderPointsWithStepT[recorderPointsWithStepT.Count - 1] + step)) < 0.0005)
@@ -397,9 +376,6 @@
                     }
                 }
             }
-
-
-          
             private void DrawCircle(Graphics g, PointF point)
             {
                 // Calculate the rectangle to draw the circle
@@ -585,9 +561,21 @@
             private void button3_Click(object sender, EventArgs e)
             {
                 PointF point = points[choosedCorrectPoint];
+                
+                
+                
                 float xPoint = Convert.ToSingle(textBox1.Text);
                 float yPoint = Convert.ToSingle(textBox2.Text);
 
+                if(xPoint > 10 || xPoint < -10) {
+                    MessageBox.Show(@"X - Point should be less then, and more than -10.", "Enter correct point", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                
+                
+                if(yPoint > 10 || yPoint < -10) {
+                    MessageBox.Show(@"Y - Point should be less then, and more than -10.", "Enter correct point", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                
                 point.X = xPoint * gridSize + 225;
                 point.Y = 225 - yPoint * gridSize ;
                 points[choosedCorrectPoint] = point;
@@ -621,10 +609,7 @@
                 }
                 else
                 {
-                    // Handle invalid input, such as displaying an error message
                     MessageBox.Show("Invalid input. Please enter a valid number.");
-                    // You may also choose to reset the value to a default or previous value
-                    // start = DefaultValue; // Adjust DefaultValue as needed
                 }
             }
 
@@ -637,8 +622,6 @@
                 else
                 {
                     MessageBox.Show("Invalid input. Please enter a valid number.");
-                    // Optionally handle the error by resetting to a default or previous value
-                    // end = DefaultValue; // Adjust DefaultValue as needed
                 }
             }
 
@@ -651,28 +634,22 @@
                 else
                 {
                     MessageBox.Show("Invalid input. Please enter a valid number.");
-                    // Optionally handle the error by resetting to a default or previous value
-                    // step = DefaultValue; // Adjust DefaultValue as needed
                 }
             }
 
             private void button5_Click(object sender, EventArgs e)
             {
-                // Create a StringBuilder to construct the message
                 
                
                 
                 
                 StringBuilder messageBuilder = new StringBuilder();
 
-                // Iterate through the list of points
                 foreach (PointF point in recorderPointsWithStepDots)
                 {
-                    // Append the coordinates of each point to the message
                     messageBuilder.AppendLine($"X: {point.X}, Y: {point.Y}");
                 }
 
-                // Display the message box with the points
                 MessageBox.Show(messageBuilder.ToString(), "Points Information");
             }
 
