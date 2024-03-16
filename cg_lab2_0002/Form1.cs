@@ -308,7 +308,7 @@
 
                     }
             
-                    // Use the calculated point p to draw the Bezier curve
+                    // Use the calculated pont p to draw the Bezier curve
                     
                     if (t == 0)
                     {
